@@ -1,36 +1,16 @@
-const router = require("express").Router();
-const User = require("../models/User");
-const bcrypt = require("bcrypt");
+const {
+  signupController,
+  signinController,
+} = require("../controllers/authController");
+const {
+  signupValidator,
+  signinValidator,
+  validatorResult,
+} = require("../middleware/authValidator");
 
-//REGISTER
-router.post("/register", async (req, res) => {
-  try {
-    const hashedPassword = await bcrypt.hash(req.body.password, 10);
-    const newUser = await new User({
-      username: req.body.username,
-      email: req.body.email,
-      password: hashedPassword,
-    }).save();
-    res.status(200).json(newUser);
-  } catch (err) {
-    res.status(500).json(err);
-  }
-});
-//LOGIN
-router.post("/login", async (req, res) => {
-  try {
-    const currentUser = await User.findOne({ email: req.body.email });
-    !currentUser && res.status(400).json("wrong email!");
-    const currentPassword = await bcrypt.compare(
-      req.body.password,
-      currentUser.password
-    );
-    !currentPassword && res.status(400).json("wrong password!");
-    const { password, ...other } = currentUser._doc;
-    res.status(200).json(other);
-  } catch (err) {
-    res.status(500).json(err);
-  }
-});
+const router = require("express").Router();
+
+router.post("/register", signupValidator, signupController, validatorResult);
+router.post("/signin", signinValidator, signinController, validatorResult);
 
 module.exports = router;

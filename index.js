@@ -10,7 +10,7 @@ app.use(express.json());
 app.use(morgan());
 MONGO_URL();
 
-app.get("/", (req, res) => {
+app.get("/", () => {
   console.log("Database is connected sucessfully!");
 });
 app.use("/api/auth", userAuth);
